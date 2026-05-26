@@ -12,25 +12,27 @@ class MessManagementApp extends StatefulWidget {
 }
 
 class _MessManagementAppState extends State<MessManagementApp> {
-  bool _isDarkMode = true; // Default to Dark Mode
+  bool _isDarkMode = true; // Premium Dark Mode Enabled by Default
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Mess Manager Pro',
+      title: 'Natore Pioneer Mess Pro',
       themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
         brightness: Brightness.light,
-        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+        scaffoldBackgroundColor: const Color(0xFFF1F5F9),
         cardColor: Colors.white,
         primarySwatch: Colors.blue,
+        useMaterial3: true,
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F172A), // Dark Navy
-        cardColor: const Color(0xFF1E293B), // Slate Card
+        scaffoldBackgroundColor: const Color(0xFF0F172A), // Premium Deep Slate
+        cardColor: const Color(0xFF1E293B), // Sleek Card Fill
         primarySwatch: Colors.blue,
+        useMaterial3: true,
       ),
       home: DashboardScreen(
         isDarkMode: _isDarkMode,
@@ -40,6 +42,7 @@ class _MessManagementAppState extends State<MessManagementApp> {
   }
 }
 
+// Data Architectures
 class Member {
   final int id;
   final String name;
@@ -54,10 +57,11 @@ class OtherExpense {
 }
 
 class BazaarLog {
-  final int memberId;
+  final String date;
+  final String memberName;
   final double amount;
   final String item;
-  BazaarLog({required this.memberId, required this.amount, required this.item});
+  BazaarLog({required this.date, required this.memberName, required this.amount, required this.item});
 }
 
 class CashDeposit {
@@ -76,29 +80,46 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final String _messName = "Natore Pioneer Mess";
+  final String _messName = "Natore Pioneer Mess 👑";
   
+  // Initialized Data Sets
   final List<Member> _members = [
-    Member(id: 1, name: "Arif", meals: 0),
-    Member(id: 2, name: "Azazul", meals: 0),
-    Member(id: 3, name: "Sakib", meals: 0),
+    Member(id: 1, name: "Arif", meals: 24.5),
+    Member(id: 2, name: "Azazul", meals: 22.0),
+    Member(id: 3, name: "Sakib", meals: 18.0),
   ];
 
-  final List<OtherExpense> _otherExpenses = [];
-  final List<BazaarLog> _bazaarLogs = [];
-  final List<CashDeposit> _cashDeposits = [];
+  final List<OtherExpense> _otherExpenses = [
+    OtherExpense(tag: "Gas Cylinder", amount: 1400)
+  ];
 
-  // Controllers for text boxes
-  final _rentController = TextEditingController(text: "0");
-  final _maidController = TextEditingController(text: "0");
-  final _electricityController = TextEditingController(text: "0");
-  final _wifiController = TextEditingController(text: "0");
+  final List<BazaarLog> _bazaarLogs = [
+    BazaarLog(date: "25 May", memberName: "Arif", amount: 1850, item: "Chicken & Rice"),
+    BazaarLog(date: "26 May", memberName: "Azazul", amount: 650, item: "Eggs & Oil")
+  ];
+
+  final List<CashDeposit> _cashDeposits = [
+    CashDeposit(memberId: 1, amount: 3000),
+    CashDeposit(memberId: 2, amount: 3000),
+    CashDeposit(memberId: 3, amount: 4500),
+  ];
+
+  // Bill Controllers
+  final _rentController = TextEditingController(text: "12000");
+  final _maidController = TextEditingController(text: "2000");
+  final _electricityController = TextEditingController(text: "1600");
+  final _wifiController = TextEditingController(text: "500");
 
   int _selectedMemberId = 1;
+  
+  // Meal Matrix Checkbox States
+  bool _bfChecked = false;
+  bool _lunchChecked = true;
+  bool _dinnerChecked = true;
+
   final _depositController = TextEditingController();
   final _bazaarAmountController = TextEditingController();
   final _bazaarItemController = TextEditingController();
-  final _mealController = TextEditingController();
   final _otherTagController = TextEditingController();
   final _otherAmountController = TextEditingController();
 
@@ -113,100 +134,106 @@ class _DashboardScreenState extends State<DashboardScreen> {
     double totalBazaar = _bazaarLogs.fold(0, (sum, b) => sum + b.amount);
     double totalOthers = _otherExpenses.fold(0, (sum, o) => sum + o.amount);
     
-    // Shared bills calculation (Rent, Maid, Utilities, Others divided equally)
     double totalFixedExpenses = currentRent + currentElectricity + currentWifi + currentMaidBill + totalOthers;
     double totalExpense = totalBazaar + totalFixedExpenses;
     
     double mealRate = totalMeals > 0 ? totalBazaar / totalMeals : 0;
     double fixedPerPerson = totalFixedExpenses / _members.length;
 
-    double getIndividualDeposit(int memberId) {
+    double getIndividualDeposit(int memberId, String name) {
       double cash = _cashDeposits.where((c) => c.memberId == memberId).fold(0, (sum, c) => sum + c.amount);
-      double bazaar = _bazaarLogs.where((b) => b.memberId == memberId).fold(0, (sum, b) => sum + b.amount);
+      double bazaar = _bazaarLogs.where((b) => b.memberName == name).fold(0, (sum, b) => sum + b.amount);
       return cash + bazaar;
     }
 
-    double totalDeposit = _members.fold(0, (sum, m) => sum + getIndividualDeposit(m.id));
+    double totalDeposit = _members.fold(0, (sum, m) => sum + getIndividualDeposit(m.id, m.name));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_messName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: Text(_messName, style: const TextStyle(fontWeight: FontWeight.black, fontSize: 19, letterSpacing: 0.5)),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            icon: Icon(widget.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round),
             onPressed: () => widget.onThemeChanged(!widget.isDarkMode),
           )
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 4 Core Summary Cards Requested by User
+            // Glassmorphic Glowing Summary Board Layout
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 1.6,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
+              childAspectRatio: 1.5,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
               children: [
-                _buildCard("Total Members", "${_members.length}", Colors.blueAccent),
-                _buildCard("Total Meals", totalMeals.toString(), Colors.cyan),
-                _buildCard("Total Deposit", "৳${totalDeposit.toStringAsFixed(0)}", Colors.green),
-                _buildCard("Total Expense", "৳${totalExpense.toStringAsFixed(0)}", Colors.roseAccent),
+                _buildGlassCard("Total Members", "${_members.length} Active", const Color(0xFF3B82F6), Icons.group),
+                _buildGlassCard("Total Meals", totalMeals.toString(), const Color(0xFF06B6D4), Icons.restaurant),
+                _buildGlassCard("Total Deposit", "৳${totalDeposit.toStringAsFixed(0)}", const Color(0xFF10B981), Icons.account_balance_wallet),
+                _buildGlassCard("Total Expense", "৳${totalExpense.toStringAsFixed(0)}", const Color(0xFFF43F5E), Icons.analytics),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
 
-            // Live rate strip
+            // Live Analytics Strip
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.blueAccent.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-              child: Text(
-                "Meal Rate: ৳${mealRate.toStringAsFixed(2)} | Fixed/Person: ৳${fixedPerPerson.toStringAsFixed(0)}",
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blueAccent, fontSize: 12),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [Colors.blue.withOpacity(0.15), Colors.cyan.withOpacity(0.15)]),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Colors.blue.withOpacity(0.2)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text("🔥 Meal Rate: ৳${mealRate.toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.blueAccent)),
+                  Text("💼 Shared/Head: ৳${fixedPerPerson.toStringAsFixed(0)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.cyan)),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // Fixed Bills Inputs (Custom Rent, Shared Maid Bill)
-            const Text("Monthly Fixed Bills Config", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
+            // Fixed Bills Panel Upgrade
+            _buildHeading("Monthly Utilities Config"),
             Card(
-              margin: EdgeInsets.zero,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.withOpacity(0.15))),
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(14.0),
                 child: Column(
                   children: [
                     Row(
                       children: [
-                        Expanded(child: TextField(controller: _rentController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Custom Rent"), onChanged: (v) => setState(() {}))),
-                        const SizedBox(width: 12),
-                        Expanded(child: TextField(controller: _maidController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Maid Bill (Shared)"), onChanged: (v) => setState(() {}))),
+                        Expanded(child: TextField(controller: _rentController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Rent (Custom)", prefixText: "৳"), onChanged: (v) => setState(() {}))),
+                        const SizedBox(width: 14),
+                        Expanded(child: TextField(controller: _maidController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Maid (Split)", prefixText: "৳"), onChanged: (v) => setState(() {}))),
                       ],
                     ),
                     Row(
                       children: [
-                        Expanded(child: TextField(controller: _electricityController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Electricity"), onChanged: (v) => setState(() {}))),
-                        const SizedBox(width: 12),
-                        Expanded(child: TextField(controller: _wifiController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "WiFi"), onChanged: (v) => setState(() {}))),
+                        Expanded(child: TextField(controller: _electricityController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "Electricity", prefixText: "৳"), onChanged: (v) => setState(() {}))),
+                        const SizedBox(width: 14),
+                        Expanded(child: TextField(controller: _wifiController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "WiFi Router", prefixText: "৳"), onChanged: (v) => setState(() {}))),
                       ],
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // Roommates Status Matrix
-            const Text("Live Roommate Ledger", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
+            // Roommates Matrix with Automatic In-Profit / In-Debt Status Badges
+            _buildHeading("Live Matrix Ledger"),
             Card(
-              margin: EdgeInsets.zero,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.withOpacity(0.15))),
               child: ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -214,116 +241,178 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 separatorBuilder: (c, i) => const Divider(height: 1),
                 itemBuilder: (context, index) {
                   final member = _members[index];
-                  double individualDeposit = getIndividualDeposit(member.id);
+                  double individualDeposit = getIndividualDeposit(member.id, member.name);
                   double individualCost = (member.meals * mealRate) + fixedPerPerson;
                   double balance = individualDeposit - individualCost;
+                  bool isProfit = balance >= 0;
 
                   return ListTile(
-                    title: Text(member.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    subtitle: Text("${member.meals} Meals • Dep: ৳${individualDeposit.toStringAsFixed(0)}", style: const TextStyle(fontSize: 12)),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    title: Row(
+                      children: [
+                        Text(member.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isProfit ? Colors.green.withOpacity(0.15) : Colors.red.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            isProfit ? "IN PROFIT" : "OWES CASH",
+                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.black, color: isProfit ? Colors.green : Colors.redAccent),
+                          ),
+                        )
+                      ],
+                    ),
+                    subtitle: Text("${member.meals} Meals Taken • Deposited: ৳${individualDeposit.toStringAsFixed(0)}", style: const TextStyle(fontSize: 12)),
                     trailing: Text(
-                      "${balance >= 0 ? '+' : ''}৳${balance.toStringAsFixed(1)}",
-                      style: TextStyle(
-                        fontFamily: 'monospace',
-                        fontWeight: FontWeight.bold,
-                        color: balance >= 0 ? Colors.green : Colors.redAccent,
-                      ),
+                      "${isProfit ? '+' : ''}৳${balance.toStringAsFixed(0)}",
+                      style: TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.black, fontSize: 15, color: isProfit ? Colors.green : Colors.redAccent),
                     ),
                   );
                 },
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // Forms Panel
-            const Text("Log Activity Entry Form", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
+            // Feature Upgrade: Advanced Checkbox Grid Meal Matrix Tracker
+            _buildHeading("Smart Log Workspace"),
             Card(
-              margin: EdgeInsets.zero,
-              padding: const EdgeInsets.all(12),
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.withOpacity(0.15))),
+              padding: const EdgeInsets.all(14),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   DropdownButtonFormField<int>(
                     value: _selectedMemberId,
-                    decoration: const InputDecoration(labelText: "Select Roommate Context", border: OutlineInputBorder()),
+                    decoration: const InputDecoration(labelText: "Select Roommate Focus", border: OutlineInputBorder()),
                     items: _members.map((m) => DropdownMenuItem(value: m.id, child: Text(m.name))).toList(),
                     onChanged: (val) => setState(() => _selectedMemberId = val!),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
 
-                  // Deposit Input Form Field (Accepts 0)
+                  // Cash Entry Field
                   Row(
                     children: [
-                      Expanded(child: TextField(controller: _depositController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "1. Add Cash Deposit (Can be 0)"))),
-                      const SizedBox(width: 6),
-                      ElevatedButton(
+                      Expanded(child: TextField(controller: _depositController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "1. Handover Cash (Can be 0)"))),
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.add_moderator),
                         onPressed: () {
                           double amt = double.tryParse(_depositController.text) ?? 0;
                           setState(() => _cashDeposits.add(CashDeposit(memberId: _selectedMemberId, amount: amt)));
                           _depositController.clear();
                         },
-                        child: const Text("Save"),
+                        label: const Text("Save"),
                       )
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 20),
 
-                  // Bazaar inputs (Links to deposit history automatically)
+                  const Text("2. Advanced Meal Checkbox Matrix", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildMealCheck("Breakfast (0.5)", _bfChecked, (v) => setState(() => _bfChecked = v!)),
+                      _buildMealCheck("Lunch (1.0)", _lunchChecked, (v) => setState(() => _lunchChecked = v!)),
+                      _buildMealCheck("Dinner (1.0)", _dinnerChecked, (v) => setState(() => _dinnerChecked = v!)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.dinner_dining),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent, foregroundColor: Colors.white),
+                      onPressed: () {
+                        double sessionSum = 0;
+                        if (_bfChecked) sessionSum += 0.5;
+                        if (_lunchChecked) sessionSum += 1.0;
+                        if (_dinnerChecked) sessionSum += 1.0;
+                        setState(() {
+                          _members.firstWhere((m) => m.id == _selectedMemberId).meals += sessionSum;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Added $sessionSum meals successfully!"), duration: const Duration(seconds: 1)));
+                      },
+                      label: const Text("Commit Selected Meals Matrix"),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Bazaar System
+                  const Text("3. Log Daily Bazaar Expenditure", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
-                      Expanded(child: TextField(controller: _bazaarItemController, decoration: const InputDecoration(hintText: "Items Bought"))),
-                      const SizedBox(width: 6),
+                      Expanded(child: TextField(controller: _bazaarItemController, decoration: const InputDecoration(hintText: "Fish, Dal, etc."))),
+                      const SizedBox(width: 8),
                       Expanded(child: TextField(controller: _bazaarAmountController, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: "Cost"))),
-                      const SizedBox(width: 6),
-                      ElevatedButton(
+                      const SizedBox(width: 8),
+                      IconButton.filled(
                         onPressed: () {
                           double amt = double.tryParse(_bazaarAmountController.text) ?? 0;
                           if (amt <= 0 || _bazaarItemController.text.isEmpty) return;
-                          setState(() => _bazaarLogs.add(BazaarLog(memberId: _selectedMemberId, amount: amt, item: _bazaarItemController.text)));
+                          String activeName = _members.firstWhere((m) => m.id == _selectedMemberId).name;
+                          setState(() => _bazaarLogs.insert(0, BazaarLog(date: "26 May", memberName: activeName, amount: amt, item: _bazaarItemController.text)));
                           _bazaarAmountController.clear();
                           _bazaarItemController.clear();
                         },
-                        child: const Text("Log"),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Meals Input Form Field
-                  Row(
-                    children: [
-                      Expanded(child: TextField(controller: _mealController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "3. Increment Meal Count"))),
-                      const SizedBox(width: 6),
-                      ElevatedButton(
-                        onPressed: () {
-                          double count = double.tryParse(_mealController.text) ?? 0;
-                          setState(() => _members.firstWhere((m) => m.id == _selectedMemberId).meals += count);
-                          _mealController.clear();
-                        },
-                        child: const Text("Add"),
+                        icon: const Icon(Icons.shopping_cart_checkout),
                       )
                     ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // Tagged Custom Utilities Section
-            const Text("Custom 'Others' Tags Panel", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
+            // Feature Upgrade: Interactive Dynamic Bazaar Log Feed with Dates
+            _buildHeading("Bazaar Log Statement Feed"),
             Card(
-              margin: EdgeInsets.zero,
-              padding: const EdgeInsets.all(12),
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.withOpacity(0.15))),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _bazaarLogs.length > 4 ? 4 : _bazaarLogs.length, // Keeps UI compressed
+                  itemBuilder: (context, index) {
+                    final log = _bazaarLogs[index];
+                    return ListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(color: Colors.emerald.withOpacity(0.12), borderRadius: BorderRadius.circular(10)),
+                        child: const Icon(Icons.receipt_long, color: Colors.emerald, size: 20),
+                      ),
+                      title: Text(log.item, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      subtitle: Text("Bought by ${log.memberName} • ${log.date}", style: const TextStyle(fontSize: 11)),
+                      trailing: Text("৳${log.amount.toStringAsFixed(0)}", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Tagged Miscellaneous Dynamic Expense Engine
+            _buildHeading("Custom Miscellaneous Bills"),
+            Card(
+              padding: const EdgeInsets.all(14),
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.withOpacity(0.15))),
               child: Column(
                 children: [
                   Row(
                     children: [
-                      Expanded(child: TextField(controller: _otherTagController, decoration: const InputDecoration(hintText: "Tag (e.g. Gas Cylinder)"))),
-                      const SizedBox(width: 6),
-                      Expanded(child: TextField(controller: _otherAmountController, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: "Cost Amount"))),
+                      Expanded(child: TextField(controller: _otherTagController, decoration: const InputDecoration(hintText: "Tag Name (e.g., Tissue)"))),
+                      const SizedBox(width: 8),
+                      Expanded(child: TextField(controller: _otherAmountController, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: "Cost"))),
                       IconButton(
-                        icon: const Icon(Icons.add_circle, color: Colors.emerald, size: 28),
+                        icon: const Icon(Icons.add_circle, color: Colors.blueAccent, size: 32),
                         onPressed: () {
                           double amt = double.tryParse(_otherAmountController.text) ?? 0;
                           if (_otherTagController.text.isEmpty || amt <= 0) return;
@@ -334,38 +423,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       )
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: _otherExpenses.map((o) => Chip(label: Text("#${o.tag}: ৳${o.amount.toStringAsFixed(0)}"))).toList(),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCard(String title, String val, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(title.toUpperCase(), style: const TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 2),
-          Text(val, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
-        ],
-      ),
-    );
-  }
-}
+                    spacing: 8,
+                    runSpacing: 8,
+                    children:
