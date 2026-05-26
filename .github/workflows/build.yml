@@ -2,27 +2,29 @@ name: Compile Mobile App APK
 on: [push]
 jobs:
   engine_build:
-    runs-on: ubuntu-latest
+    runs-runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          
-      # 1. Force the engine to build the missing Android native directory structures explicitly
-      - run: flutter create . --overwrite --platforms=android --org com.natore.mojarmess
-      
-      # 2. Update compatibility targets since the folder now definitely exists
-      - name: Force Modern Android Target SDK
-        run: |
-          sed -i 's/compileSdkVersion .*/compileSdkVersion 34/g' android/app/build.gradle
-          sed -i 's/targetSdkVersion .*/targetSdkVersion 34/g' android/app/build.gradle
 
-      # 3. Inject your premium layout matrix directly into the workspace code
-      - name: Inject Premium Mess Dashboard Code
+      # Everything is combined inside a single workspace path context so it cannot lose files
+      - name: Create Sandbox App and Inject Premium Code
         run: |
-          cat << 'EOF' > lib/main.dart
+          cd ..
+          rm -rf sandbox_app
+          
+          # 1. Create the clean project structure
+          flutter create sandbox_app --org com.natore.mojarmess --platforms=android
+          
+          # 2. Upgrade the Target SDK configurations directly inside the folder
+          sed -i 's/compileSdkVersion .*/compileSdkVersion 34/g' sandbox_app/android/app/build.gradle
+          sed -i 's/targetSdkVersion .*/targetSdkVersion 34/g' sandbox_app/android/app/build.gradle
+          
+          # 3. Overwrite the code with your premium mess UI dashboard
+          cat << 'EOF' > sandbox_app/lib/main.dart
           import 'package:flutter/material.dart';
 
           void main() {
@@ -489,12 +491,15 @@ jobs:
             }
           }
           EOF
-          
-      - run: flutter pub get
-      - run: flutter build apk --split-per-abi
+
+      - name: Fetch and Compile App Build
+        run: |
+          cd ../sandbox_app
+          flutter pub get
+          flutter build apk --split-per-abi
       
-      - name: Export APK
+      - name: Export APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: phone-app
-          path: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+          path: ../sandbox_app/build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
