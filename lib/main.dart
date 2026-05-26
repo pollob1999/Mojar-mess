@@ -12,7 +12,7 @@ class MessManagementApp extends StatefulWidget {
 }
 
 class _MessManagementAppState extends State<MessManagementApp> {
-  bool _isDarkMode = true; // Premium Dark Mode Enabled by Default
+  bool _isDarkMode = true;
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +29,8 @@ class _MessManagementAppState extends State<MessManagementApp> {
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F172A), // Premium Deep Slate
-        cardColor: const Color(0xFF1E293B), // Sleek Card Fill
+        scaffoldBackgroundColor: const Color(0xFF0F172A),
+        cardColor: const Color(0xFF1E293B),
         primarySwatch: Colors.blue,
         useMaterial3: true,
       ),
@@ -42,7 +42,6 @@ class _MessManagementAppState extends State<MessManagementApp> {
   }
 }
 
-// Data Architectures
 class Member {
   final int id;
   final String name;
@@ -82,7 +81,6 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final String _messName = "Natore Pioneer Mess 👑";
   
-  // Initialized Data Sets
   final List<Member> _members = [
     Member(id: 1, name: "Arif", meals: 24.5),
     Member(id: 2, name: "Azazul", meals: 22.0),
@@ -104,15 +102,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     CashDeposit(memberId: 3, amount: 4500),
   ];
 
-  // Bill Controllers
   final _rentController = TextEditingController(text: "12000");
   final _maidController = TextEditingController(text: "2000");
   final _electricityController = TextEditingController(text: "1600");
   final _wifiController = TextEditingController(text: "500");
 
   int _selectedMemberId = 1;
-  
-  // Meal Matrix Checkbox States
   bool _bfChecked = false;
   bool _lunchChecked = true;
   bool _dinnerChecked = true;
@@ -150,7 +145,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_messName, style: const TextStyle(fontWeight: FontWeight.black, fontSize: 19, letterSpacing: 0.5)),
+        title: Text(_messName, style: const TextStyle(fontWeight: FontWeight.black, fontSize: 19)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -164,7 +159,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Glassmorphic Glowing Summary Board Layout
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -180,8 +174,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             const SizedBox(height: 14),
-
-            // Live Analytics Strip
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
@@ -199,8 +191,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Fixed Bills Panel Upgrade
             _buildHeading("Monthly Utilities Config"),
             Card(
               elevation: 0,
@@ -228,8 +218,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Roommates Matrix with Automatic In-Profit / In-Debt Status Badges
             _buildHeading("Live Matrix Ledger"),
             Card(
               elevation: 0,
@@ -275,8 +263,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Feature Upgrade: Advanced Checkbox Grid Meal Matrix Tracker
             _buildHeading("Smart Log Workspace"),
             Card(
               elevation: 0,
@@ -292,8 +278,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     onChanged: (val) => setState(() => _selectedMemberId = val!),
                   ),
                   const SizedBox(height: 16),
-
-                  // Cash Entry Field
                   Row(
                     children: [
                       Expanded(child: TextField(controller: _depositController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: "1. Handover Cash (Can be 0)"))),
@@ -310,7 +294,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-
                   const Text("2. Advanced Meal Checkbox Matrix", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
                   const SizedBox(height: 6),
                   Row(
@@ -335,14 +318,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         setState(() {
                           _members.firstWhere((m) => m.id == _selectedMemberId).meals += sessionSum;
                         });
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Added $sessionSum meals successfully!"), duration: const Duration(seconds: 1)));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Added $sessionSum meals successfully!")));
                       },
                       label: const Text("Commit Selected Meals Matrix"),
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Bazaar System
                   const Text("3. Log Daily Bazaar Expenditure", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
                   const SizedBox(height: 4),
                   Row(
@@ -368,8 +349,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Feature Upgrade: Interactive Dynamic Bazaar Log Feed with Dates
             _buildHeading("Bazaar Log Statement Feed"),
             Card(
               elevation: 0,
@@ -379,7 +358,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _bazaarLogs.length > 4 ? 4 : _bazaarLogs.length, // Keeps UI compressed
+                  itemCount: _bazaarLogs.length > 4 ? 4 : _bazaarLogs.length,
                   itemBuilder: (context, index) {
                     final log = _bazaarLogs[index];
                     return ListTile(
@@ -397,8 +376,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Tagged Miscellaneous Dynamic Expense Engine
             _buildHeading("Custom Miscellaneous Bills"),
             Card(
               padding: const EdgeInsets.all(14),
@@ -427,4 +404,62 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children:
+                    children: _otherExpenses.map((o) => Chip(
+                      label: Text("#${o.tag}: ৳${o.amount.toStringAsFixed(0)}"),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    )).toList(),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeading(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.black, letterSpacing: 0.3),
+    );
+  }
+
+  Widget _buildMealCheck(String label, bool value, ValueChanged<bool?> onChanged) {
+    return Row(
+      children: [
+        Checkbox(value: value, onChanged: onChanged, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap),
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  Widget _buildGlassCard(String title, String val, Color highlightColor, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.withOpacity(0.12)),
+        boxShadow: [
+          BoxShadow(color: highlightColor.withOpacity(0.04), blurRadius: 12, offset: const Offset(0, 4))
+        ]
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title.toUpperCase(), style: const TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.black, letterSpacing: 0.5)),
+              Icon(icon, size: 16, color: highlightColor.withOpacity(0.6)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(val, style: TextStyle(fontSize: 18, fontWeight: FontWeight.black, color: highlightColor)),
+        ],
+      ),
+    );
+  }
+}
