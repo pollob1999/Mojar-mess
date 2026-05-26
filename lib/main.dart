@@ -421,7 +421,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildHeading(String text) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 8),
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.black, letterSpacing: 0.3),
+      child: Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.black, letterSpacing: 0.3)),
     );
   }
 
