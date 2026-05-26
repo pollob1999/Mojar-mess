@@ -5,11 +5,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          
+      # This generates the missing Android/Gradle configuration folders automatically!
+      - run: flutter create . --overwrite --org com.natore.mojarmess
+      
       - run: flutter pub get
       - run: flutter build apk --split-per-abi
+      
       - name: Export APK
         uses: actions/upload-artifact@v4
         with:
